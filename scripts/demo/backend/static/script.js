@@ -55,7 +55,7 @@ async function synchronizeAndPlay() {
 }
 
 async function fetchCurrentSongInfo() {
-    const response = await fetch('/current_song_info');
+    const response = await fetch(`/${GENRE}/current_song_info`);
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -64,7 +64,7 @@ async function fetchCurrentSongInfo() {
 
 async function loadSong(index) {
     if (!songCache[index]) {
-        const response = await fetch(`/get_song/${index}`);
+        const response = await fetch(`/${GENRE}/get_song/${index}`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }

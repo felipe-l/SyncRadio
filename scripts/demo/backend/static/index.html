@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI LIVE Radio</title>
+    <title>AI Radio Stations</title>
     <style>
         body {
             display: flex;
@@ -23,50 +23,58 @@
         }
         h1 {
             color: #333;
-            font-size: 2em;
+            font-size: 2.5em; /* Changed font size from 2em to 2.5em */
             margin-bottom: 20px;
         }
-        button {
-            padding: 10px 20px;
-            font-size: 1em;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
+        .radio-list {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .radio-item {
             cursor: pointer;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            padding: 10px;
+            margin: 10px;
+            border: 2px solid #cfcfcf;
         }
-        button:hover {
-            background-color: #0056b3;
+        .radio-item:hover {
+            transform: scale(1.05);
         }
-        audio {
-            width: 100%;
-            margin-top: 20px;
+        .radio-item img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
         }
-        input[type="range"] {
-            width: 50%;
-            margin-top: 10px;
-        }
-        #currentTime, #totalTime, #songName, #metaSettings {
-            margin-top: 10px;
-        }
-        #songName {
-            display: block;
+        .radio-item h2 {
+            margin: 10px 0;
+            font-size: 1.5em; /* Changed font size from default to 1.5em */
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- <h1>AI Live Radio 📻</h1> -->
-        <h1>AI Live Radio 📻</h1>
-        <button id="playButton">Play</button>
-        <audio id="audioPlayer"></audio>
-        <div id="metaSettings">
-            <span id="songName"></span> <!-- Display for song name -->
-            <span id="currentTime">0:00</span> / <span id="totalTime">0:00</span>
+        <h1>Welcome to AI Radio Stations</h1>
+        <div class="radio-list">
+            <div class="radio-item" onclick="window.location.href='/house'">
+                <span style="font-size: 2.5em;">🏠</span>
+                <h2>House Radio</h2>
+            </div>
+            <div class="radio-item" onclick="window.location.href='/techno'">
+                <span style="font-size: 2.5em;">🎶</span>
+                <h2>Techno Radio</h2>
+            </div>
+            <div class="radio-item" onclick="window.location.href='/ava'">
+                <span style="font-size: 2.5em;">🐕</span>
+                <h2>AVA Radio</h2>
+            </div>
         </div>
-        <label for="volumeControl">🔊</label>
-        <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="0.5" oninput="audioPlayer.volume = this.value;">
     </div>
-    <script src="/static/script.js"></script>
+    <footer style="position: fixed; bottom: 0; width: 100%; background-color: #333; color: white; text-align: center; padding: 10px;">Powered with Artificial Intelligence 🤖 and ❤️</footer>
 </body>
 </html>

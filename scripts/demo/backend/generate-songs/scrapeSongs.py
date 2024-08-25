@@ -6,6 +6,7 @@ import sys
 import os
 from dotenv import load_dotenv
 from config import search_config 
+from getToken import refreshToken
 
 if len(sys.argv) != 2:
     print("Please provide one argument: <search_name>")
@@ -43,7 +44,9 @@ headers = {
 }
 
 songs_json = {}
-for i in range(0,500):
+for i in range(0,6):
+    if search_config['search_type'] == "public_song":
+        headers["authorization"] = f"Bearer {refreshToken()}"
     data = {
         "search_queries": [
             {
@@ -90,3 +93,5 @@ for i in range(0,500):
 
     print(response.status_code)
     time.sleep(random.randint(40, 70))
+
+print("Success: Completed all iterations!")

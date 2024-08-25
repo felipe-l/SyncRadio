@@ -22,7 +22,7 @@ with open(f'songs-scrape/songs-{search_name}.json', 'r') as f:  # Changed 'sampl
     end_index = len(songs)
     for i in range(start_index, end_index):
         audio_url = songs[i]["audio_url"]
-        audio_name = f"{songs[i]['title']}_{uuid.uuid4().hex}"  # Include title in the audio name with a unique id
+        audio_name = f"{songs[i]['title'].strip()}_{uuid.uuid4().hex}"  # Include title in the audio name with a unique id after removing trailing whitespace
         display_name = f'{folder_name}/{audio_name}.mp3'
         response = requests.get(audio_url)
         with open(display_name, 'wb') as audio_file:
