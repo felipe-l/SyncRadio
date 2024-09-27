@@ -80,3 +80,34 @@ function formatTime(seconds) {
     const secs = seconds % 60;
     return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
 }
+
+
+// Function to send hearbeat to be included in active listener count
+function sendHeartbeat() {
+    fetch(`/${GENRE}/heartbeat`);
+}
+
+// Function to fetch and change active listener counter
+async function updateListenerCount() {
+    try {
+        const response = await fetch(`/${GENRE}/listener_count`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        document.getElementById('listenerCountValue').textContent = data.count;
+    } catch (error) {
+        console.error('Error updating listener count:', error);
+    }
+}
+
+// Send heartbeat and update listener count every 30 seconds
+setInterval(() => {
+    sendHeartbeat();
+    setTimeout(() => {}, 1000); // Sleep between requests or else you won't be counted in count first time
+    updateListenerCount();
+}, 15000);
+
+// Initial update
+sendHeartbeat();
+updateListenerCount();

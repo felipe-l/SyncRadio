@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, send_file, send_from_directory
+from flask import Flask, jsonify, send_file, send_from_directory, request
 import time
 import threading
 import os
@@ -7,7 +7,7 @@ import random
 
 app = Flask(__name__)
 
-GENRES = ['techno', 'house', 'ava']
+GENRES = ['techno', 'house', 'ava', 'jrock']
 SONGS_DIR = 'songs'
 SONGS = {genre: [f for f in os.listdir(os.path.join(SONGS_DIR, genre)) if f.endswith('.mp3')] for genre in GENRES}
 
@@ -16,6 +16,9 @@ for list_of_songs in SONGS.values():
     random.shuffle(list_of_songs)
 
 SONG_DURATIONS = {genre: {} for genre in GENRES}
+
+# Dictionary to store active listeners
+active_listeners = {genre: {} for genre in GENRES}
 
 class MusicPlayer:
     def __init__(self, genre):
@@ -28,9 +31,9 @@ class MusicPlayer:
         while True:
             with self.lock:
                 self.current_time += 1
-                print("UPDATING", self.genre, self.current_song_index, self.current_time, SONG_DURATIONS[self.genre][SONGS[self.genre][self.current_song_index]])
+                #print("UPDATING", self.genre, self.current_song_index, self.current_time, SONG_DURATIONS[self.genre][SONGS[self.genre][self.current_song_index]])
                 if self.current_time >= SONG_DURATIONS[self.genre][SONGS[self.genre][self.current_song_index]]:
-                    print("CHANGING SONG", self.genre)
+                    #print("CHANGING SONG", self.genre)
                     self.current_song_index = (self.current_song_index + 1) % len(SONGS[self.genre])
                     self.current_time = 0
             time.sleep(1)
@@ -42,6 +45,14 @@ def load_song_durations():
         for song in SONGS[genre]:
             audio = MP3(os.path.join(SONGS_DIR, genre, song))
             SONG_DURATIONS[genre][song] = int(audio.info.length)
+
+# Function to clean up inactive listeners
+def cleanup_listeners():
+    while True:
+        current_time = time.time()
+        for genre in GENRES:
+            active_listeners[genre] = {id: last_active for id, last_active in active_listeners[genre].items() if current_time - last_active < 60}
+        time.sleep(60)  # Run every 60 seconds
 
 @app.route('/<genre>/current_song_info')
 def current_song_info(genre):
@@ -71,7 +82,7 @@ def get_song(genre, index):
 @app.route('/<genre>')
 def serve_genre_index(genre):
     genre = genre.lower()
-    if genre not in GENRES and genre != "charly":
+    if genre not in GENRES and genre not in ["charly","hbd","msweets"]:
         return "Genre not found", 404
     print("SENDING TO ", genre)
     return send_from_directory('static', f'{genre}.html')
@@ -80,6 +91,27 @@ def serve_genre_index(genre):
 def serve_index():
     return send_from_directory('static', 'index.html')
 
+@app.route('/<genre>/heartbeat')
+def heartbeat(genre):
+    genre = genre.lower()
+    if genre not in GENRES:
+        return "Genre not found", 404
+    
+    listener_id = request.headers.get('X-Forwarded-For')  # Use IP address as listener ID from AWS header
+    active_listeners[genre][listener_id] = time.time()
+    print("HERE", active_listeners[genre])
+    return "OK"
+
+@app.route('/<genre>/listener_count')
+def listener_count(genre):
+    genre = genre.lower()
+    if genre not in GENRES:
+        return "Genre not found", 404
+    
+    count = len(active_listeners[genre])
+    print("SENDING COUNT")
+    return jsonify({"count": count})
+
 if __name__ == '__main__':
     load_song_durations()
     
@@ -87,5 +119,9 @@ if __name__ == '__main__':
     for player in players.values():
         bg_thread = threading.Thread(target=player.update, daemon=True)
         bg_thread.start()
+    
+    # Start the background thread for cleanup
+    cleanup_thread = threading.Thread(target=cleanup_listeners, daemon=True)
+    cleanup_thread.start()
     
     app.run(host="0.0.0.0", port=5000, debug=True)

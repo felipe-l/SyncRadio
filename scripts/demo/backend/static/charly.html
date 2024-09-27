@@ -52,18 +52,24 @@
         #songName {
             display: block;
         }
+        #listenerCount {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Charly's Radio 📻</h1>
         <button id="playButton" onclick="playAudio()">Play Charly's Toast</button>
-        <audio id="audioPlayer" src="static/CharlyDreamCut.mp3"></audio>
+        <audio id="audioPlayer" src="static/singles/CharlyDreamCut.mp3"></audio>
         <div id="metaSettings">
             <span id="songName">Charly's Toast</span> <!-- Display for song name -->
         </div>
         <label for="volumeControl">🔊</label>
         <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="0.5" oninput="audioPlayer.volume = this.value;">
+        <div id="listenerCount">Listeners: <span id="listenerCountValue">0</span></div>
     </div>
     <script>
         const GENRE = 'charly';
